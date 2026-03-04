@@ -1,0 +1,3035 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Devs Hub — Servidor de Programação</title>
+    <meta name="description"
+        content="Devs Hub: trilhas do zero ao avançado, desafios práticos, mentoria e uma comunidade que ajuda de verdade. Entre e comece hoje." />
+    <meta name="theme-color" content="#0b0b0f" />
+    <meta property="og:title" content="Devs Hub — Servidor de Programação" />
+    <meta property="og:description"
+        content="Trilhas, projetos e mentoria. Comunidade ativa e sem toxicidade. Entre e comece hoje." />
+    <meta property="og:type" content="website" />
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230b0b0f'/%3E%3Cpath d='M22 19 L14 32 L22 45' stroke='%23FFD600' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M42 19 L50 32 L42 45' stroke='%23FF6B00' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M36 14 L28 50' stroke='%23f3f3f5' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #070708;
+            --bg2: #0b0b0f;
+            --text: #f3f3f5;
+            --muted: rgba(243, 243, 245, .68);
+            --orange: #FF6B00;
+            --yellow: #FFD600;
+            --stroke: rgba(255, 255, 255, .10);
+            --stroke2: rgba(255, 255, 255, .14);
+            --radius: 18px;
+            --radius2: 26px;
+            --shadow: 0 18px 60px rgba(0, 0, 0, .55);
+            --shadow2: 0 10px 30px rgba(0, 0, 0, .35);
+            --mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+            --sans: "Syne", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+            --max: 1180px;
+            --glassBg: rgba(10, 10, 14, .72);
+            --glassBorder: rgba(255, 255, 255, .12);
+            --glassBlur: 14px;
+            --safe-b: env(safe-area-inset-bottom, 0px);
+            --safe-r: env(safe-area-inset-right, 0px);
+            --safe-l: env(safe-area-inset-left, 0px);
+            --safe-t: env(safe-area-inset-top, 0px);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 110px;
+        }
+
+        body {
+            background:
+                radial-gradient(1200px 900px at 18% 10%, rgba(255, 107, 0, .10), transparent 60%),
+                radial-gradient(1000px 800px at 78% 18%, rgba(255, 214, 0, .08), transparent 60%),
+                linear-gradient(180deg, var(--bg), var(--bg2));
+            color: var(--text);
+            font-family: var(--sans);
+            overflow-x: hidden;
+        }
+
+        :focus-visible {
+            outline: 2px solid rgba(255, 214, 0, .75);
+            outline-offset: 3px;
+        }
+
+        .skip {
+            position: absolute;
+            left: -9999px;
+            top: 12px;
+            background: rgba(255, 214, 0, .95);
+            color: #000;
+            font-family: var(--mono);
+            padding: 10px 12px;
+            border-radius: 999px;
+            z-index: 99999;
+        }
+
+        .skip:focus {
+            left: 14px;
+        }
+
+        body.lock {
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        body.perf .noise {
+            display: none !important
+        }
+
+        body.perf #bgCanvas {
+            opacity: .45
+        }
+
+        body.perf .card,
+        body.perf .hero-visual,
+        body.perf nav,
+        body.perf .chat,
+        body.perf .toast,
+        body.perf .shot .cap {
+            box-shadow: none !important
+        }
+
+        body.perf .glass {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important
+            }
+
+            #bgCanvas {
+                display: none !important
+            }
+
+            .noise {
+                display: none !important
+            }
+        }
+
+        .glass {
+            background: var(--glassBg);
+            border: 1px solid var(--glassBorder);
+        }
+
+        @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            body:not(.perf) .glass {
+                backdrop-filter: blur(var(--glassBlur));
+                -webkit-backdrop-filter: blur(var(--glassBlur));
+            }
+        }
+
+        .noise {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .14;
+            background-image:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='260' height='260' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+            mix-blend-mode: overlay;
+            z-index: 0;
+        }
+
+        @media (pointer:fine) {
+            body {
+                cursor: none
+            }
+        }
+
+        .cursor,
+        .cursor-ring {
+            position: fixed;
+            left: -200px;
+            top: -200px;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor {
+            width: 10px;
+            height: 10px;
+            border-radius: 999px;
+            background: var(--yellow);
+            box-shadow: 0 0 20px rgba(255, 214, 0, .35);
+            transition: transform .14s ease, opacity .2s ease;
+        }
+
+        .cursor-ring {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            border: 2px solid rgba(255, 107, 0, .75);
+            box-shadow: 0 0 30px rgba(255, 107, 0, .18);
+            transition: width .2s ease, height .2s ease, opacity .2s ease, transform .25s ease;
+            opacity: .95;
+        }
+
+        @media (pointer:coarse) {
+
+            .cursor,
+            .cursor-ring {
+                display: none
+            }
+
+            body {
+                cursor: auto
+            }
+        }
+
+        .progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--orange), var(--yellow));
+            z-index: 999;
+            box-shadow: 0 0 22px rgba(255, 107, 0, .25);
+        }
+
+        .wrap {
+            width: min(var(--max), calc(100% - 48px));
+            margin-inline: auto
+        }
+
+        @media (max-width: 520px) {
+            .wrap {
+                width: min(var(--max), calc(100% - 28px));
+            }
+        }
+
+        header {
+            position: fixed;
+            top: 14px;
+            left: 0;
+            right: 0;
+            z-index: 200;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-radius: 999px;
+            box-shadow: var(--shadow2);
+            gap: 10px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: var(--text);
+            flex-shrink: 0;
+            min-width: 0;
+        }
+
+        .brand-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(255, 107, 0, .95), rgba(255, 214, 0, .92));
+            display: grid;
+            place-items: center;
+            color: #000;
+            font-family: var(--mono);
+            font-weight: 900;
+            box-shadow: 0 10px 30px rgba(255, 107, 0, .25);
+            flex-shrink: 0;
+        }
+
+        .brand span {
+            font-family: var(--mono);
+            letter-spacing: 1.6px;
+            font-size: .95rem;
+            opacity: .95;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 14px;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: rgba(243, 243, 245, .78);
+            font-family: var(--mono);
+            font-size: .78rem;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+        }
+
+        .nav-links a:hover {
+            background: rgba(255, 255, 255, .06);
+            border-color: rgba(255, 255, 255, .12);
+            color: var(--text);
+            transform: translateY(-1px);
+        }
+
+        .nav-links a[aria-current="page"] {
+            background: rgba(255, 214, 0, .08);
+            border-color: rgba(255, 214, 0, .18);
+            color: rgba(255, 214, 0, .92);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .pill {
+            border-radius: 999px;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .04);
+            color: rgba(243, 243, 245, .84);
+            font-family: var(--mono);
+            font-size: .78rem;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+            user-select: none;
+        }
+
+        .pill:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, .06);
+            border-color: rgba(255, 255, 255, .18);
+            color: var(--text);
+        }
+
+        .pill.on {
+            border-color: rgba(255, 214, 0, .35);
+            background: rgba(255, 214, 0, .08);
+            color: rgba(255, 214, 0, .92);
+        }
+
+        .cta {
+            border-radius: 999px;
+            padding: 10px 16px;
+            border: 1px solid rgba(255, 107, 0, .55);
+            background: linear-gradient(135deg, rgba(255, 107, 0, .12), rgba(255, 214, 0, .10));
+            color: var(--yellow);
+            font-family: var(--mono);
+            font-size: .78rem;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            text-decoration: none;
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s ease, border-color .2s ease;
+            white-space: nowrap;
+        }
+
+        .cta::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(90deg, transparent, rgba(255, 214, 0, .22), transparent);
+            transform: translateX(-120%);
+            transition: transform .6s ease;
+        }
+
+        .cta:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255, 214, 0, .55)
+        }
+
+        .cta:hover::before {
+            transform: translateX(120%)
+        }
+
+        .cta span {
+            position: relative;
+            z-index: 1
+        }
+
+        .hamb {
+            display: none
+        }
+
+        @media (max-width: 820px) {
+            .nav-links {
+                display: none
+            }
+
+            .hamb {
+                display: block
+            }
+        }
+
+        @media (max-width: 520px) {
+            nav {
+                padding: 12px 12px;
+            }
+
+            #togglePerf,
+            #copyInvite {
+                display: none;
+            }
+
+            .brand span {
+                display: none;
+            }
+
+            .pill {
+                padding: 9px 12px;
+            }
+
+            .cta {
+                padding: 9px 14px;
+            }
+        }
+
+        .mwrap {
+            position: fixed;
+            inset: 0;
+            z-index: 400;
+            display: none;
+            padding: 90px 18px 18px;
+            background: rgba(0, 0, 0, .72);
+        }
+
+        .mwrap.open {
+            display: block
+        }
+
+        .mmenu {
+            border-radius: 26px;
+            padding: 14px;
+            box-shadow: var(--shadow);
+        }
+
+        .mmenu a {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 12px;
+            border-radius: 16px;
+            text-decoration: none;
+            color: rgba(243, 243, 245, .92);
+            font-family: var(--mono);
+            border: 1px solid transparent;
+            background: rgba(255, 255, 255, .04);
+            margin-top: 10px;
+        }
+
+        .mmenu a:hover {
+            border-color: rgba(255, 214, 0, .22);
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .mmenu .toprow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .mmenu .toprow b {
+            font-family: var(--mono);
+            letter-spacing: 1px;
+        }
+
+        .mmenu .closem {
+            width: 42px;
+            height: 42px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, .14);
+            background: rgba(255, 255, 255, .05);
+            color: rgba(243, 243, 245, .86);
+            cursor: pointer;
+            font-family: var(--mono);
+            font-weight: 900;
+        }
+
+        main {
+            position: relative;
+            z-index: 1
+        }
+
+        .hero {
+            padding-top: 120px;
+            padding-bottom: 46px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #bgCanvas {
+            position: absolute;
+            inset: -40px;
+            width: calc(100% + 80px);
+            height: calc(100% + 80px);
+            z-index: 0;
+            opacity: .72;
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.1fr .9fr;
+            gap: 28px;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        @media (max-width: 980px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 18px
+            }
+        }
+
+        .tag {
+            width: fit-content;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255, 107, 0, .12);
+            border: 1px solid rgba(255, 107, 0, .30);
+            color: rgba(255, 214, 0, .92);
+            font-family: var(--mono);
+            font-size: .76rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            box-shadow: 0 10px 40px rgba(255, 107, 0, .10);
+        }
+
+        .tag i {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--yellow);
+            box-shadow: 0 0 18px rgba(255, 214, 0, .45);
+            display: inline-block;
+        }
+
+        h1 {
+            font-size: clamp(2.3rem, 4.8vw, 4.8rem);
+            line-height: 1.02;
+            margin-top: 16px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .h1-outline {
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(255, 214, 0, .92);
+            text-shadow: 0 0 30px rgba(255, 214, 0, .10);
+            display: block;
+            margin-top: 6px;
+        }
+
+        .lead {
+            margin-top: 18px;
+            max-width: 540px;
+            color: var(--muted);
+            font-size: 1.02rem;
+            line-height: 1.75;
+            font-family: var(--mono);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 26px;
+            align-items: center;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 14px;
+            padding: 14px 18px;
+            font-family: var(--mono);
+            font-size: .84rem;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease, color .2s ease;
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(255, 107, 0, .98), rgba(255, 214, 0, .96));
+            color: #000;
+            box-shadow: 0 18px 60px rgba(255, 107, 0, .22);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 26px 70px rgba(255, 107, 0, .28)
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .14);
+            color: rgba(243, 243, 245, .92);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 214, 0, .28);
+            box-shadow: 0 18px 60px rgba(0, 0, 0, .28);
+            color: var(--yellow);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px dashed rgba(255, 255, 255, .20);
+            color: rgba(243, 243, 245, .78);
+        }
+
+        .btn-ghost:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 214, 0, .35);
+            color: var(--text)
+        }
+
+        @media (max-width: 520px) {
+            .hero-actions .btn {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        .mini {
+            font-family: var(--mono);
+            font-size: .78rem;
+            color: rgba(243, 243, 245, .70);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 14px;
+            flex-wrap: wrap;
+        }
+
+        .mini code {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .10);
+            padding: 6px 10px;
+            border-radius: 999px;
+            color: rgba(255, 214, 0, .9);
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .hero-visual {
+            position: relative;
+            min-height: 460px;
+            border-radius: var(--radius2);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+            border: 1px solid rgba(255, 255, 255, .10);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        @media (max-width: 560px) {
+            .hero-visual {
+                min-height: 420px;
+            }
+        }
+
+        .code-panel {
+            position: absolute;
+            inset: 18px 18px auto 18px;
+            border-radius: 18px;
+            padding: 14px 14px 16px;
+            z-index: 2;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, .45);
+            overflow: hidden;
+        }
+
+        .dots {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px
+        }
+
+        .dots b {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 999px
+        }
+
+        .dots b:nth-child(1) {
+            background: #ff5f57
+        }
+
+        .dots b:nth-child(2) {
+            background: #febc2e
+        }
+
+        .dots b:nth-child(3) {
+            background: #28c840
+        }
+
+        .code {
+            font-family: var(--mono);
+            font-size: .86rem;
+            line-height: 1.55;
+            margin-left: -120px;
+            margin-top: -12px;
+            color: rgba(243, 243, 245, .90);
+            white-space: pre;
+            overflow: hidden;
+        }
+
+        .code .k {
+            color: rgba(255, 214, 0, .92)
+        }
+
+        .code .s {
+            color: rgba(255, 107, 0, .95)
+        }
+
+        .code .c {
+            color: rgba(243, 243, 245, .45)
+        }
+
+        .code .p {
+            color: rgba(243, 243, 245, .85)
+        }
+
+        .code .b {
+            color: rgba(173, 255, 255, .8)
+        }
+
+        @media (max-width: 720px) {
+            .code-panel {
+                inset: 14px 14px auto 14px;
+            }
+
+            .code {
+                margin-left: 0;
+                margin-top: 0;
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        .code-glow {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(1200px 420px at 20% 10%, rgba(255, 107, 0, .12), transparent 55%),
+                radial-gradient(900px 420px at 80% 40%, rgba(255, 214, 0, .10), transparent 55%);
+            mix-blend-mode: screen;
+            opacity: .9;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero-cards {
+            position: absolute;
+            inset: auto 18px 18px 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            z-index: 2;
+        }
+
+        .tiny {
+            padding: 14px 14px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .10);
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            transition: transform .2s ease, border-color .2s ease, background .2s ease;
+        }
+
+        .tiny:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 214, 0, .22);
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .tiny h4 {
+            font-size: .95rem;
+            margin-top: 1px
+        }
+
+        .tiny p {
+            font-family: var(--mono);
+            font-size: .78rem;
+            color: rgba(243, 243, 245, .65);
+            margin-top: 5px;
+            line-height: 1.55;
+        }
+
+        @media (max-width: 560px) {
+            .hero-cards {
+                grid-template-columns: 1fr
+            }
+
+            .code {
+                font-size: .80rem
+            }
+        }
+
+        .stats {
+            margin-top: 26px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .stat {
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, .10);
+            background: rgba(255, 255, 255, .04);
+            padding: 16px 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .20);
+            transition: transform .2s ease, border-color .2s ease, background .2s ease;
+            min-width: 0;
+        }
+
+        .stat:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 214, 0, .20);
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .stat b {
+            display: block;
+            font-family: var(--mono);
+            font-size: 1.2rem;
+            color: rgba(255, 214, 0, .95);
+            letter-spacing: .5px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .stat span {
+            display: block;
+            margin-top: 6px;
+            font-family: var(--mono);
+            font-size: .76rem;
+            color: rgba(243, 243, 245, .60);
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 980px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media (max-width: 420px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        section {
+            padding: 86px 0
+        }
+
+        .section-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 18px;
+            margin-bottom: 26px;
+        }
+
+        .kicker {
+            font-family: var(--mono);
+            font-size: .72rem;
+            letter-spacing: 3.8px;
+            text-transform: uppercase;
+            color: rgba(255, 107, 0, .92);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .kicker::before {
+            content: "";
+            width: 24px;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(255, 107, 0, 1), rgba(255, 214, 0, 1));
+            opacity: .9;
+        }
+
+        .title {
+            font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            margin-top: 10px;
+        }
+
+        .title em {
+            color: var(--yellow);
+            font-style: normal
+        }
+
+        .sub {
+            margin-top: 12px;
+            color: rgba(243, 243, 245, .65);
+            font-family: var(--mono);
+            line-height: 1.7;
+            max-width: 620px;
+            font-size: .95rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 14px;
+        }
+
+        .card {
+            border-radius: var(--radius2);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+            border: 1px solid rgba(255, 255, 255, .10);
+            box-shadow: 0 22px 70px rgba(0, 0, 0, .22);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform .2s ease, border-color .2s ease, background .2s ease;
+            min-width: 0;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 214, 0, .22);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .08), rgba(255, 255, 255, .04));
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            background: radial-gradient(420px 240px at 20% 10%, rgba(255, 107, 0, .18), transparent 60%),
+                radial-gradient(420px 240px at 90% 60%, rgba(255, 214, 0, .12), transparent 60%);
+            opacity: .8;
+            pointer-events: none;
+        }
+
+        .card>* {
+            position: relative;
+            z-index: 1
+        }
+
+        .feat {
+            grid-column: span 4;
+            min-height: 190px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .feat .icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: rgba(255, 107, 0, .12);
+            border: 1px solid rgba(255, 107, 0, .25);
+            display: grid;
+            place-items: center;
+            margin-bottom: 2px;
+            box-shadow: 0 16px 50px rgba(255, 107, 0, .08);
+        }
+
+        .feat h3 {
+            font-size: 1.05rem
+        }
+
+        .feat p {
+            color: rgba(243, 243, 245, .65);
+            font-family: var(--mono);
+            font-size: .88rem;
+            line-height: 1.7;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 6px;
+        }
+
+        .chip {
+            padding: 6px 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .04);
+            font-family: var(--mono);
+            font-size: .72rem;
+            color: rgba(243, 243, 245, .74);
+        }
+
+        .chip.hot {
+            border-color: rgba(255, 214, 0, .22);
+            color: rgba(255, 214, 0, .92);
+            background: rgba(255, 214, 0, .08);
+        }
+
+        @media (max-width: 980px) {
+            .feat {
+                grid-column: span 6
+            }
+        }
+
+        @media (max-width: 620px) {
+            .feat {
+                grid-column: span 12
+            }
+        }
+
+        .gallery {
+            grid-column: span 12;
+            display: grid;
+            grid-template-columns: 1.2fr .8fr;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .shot {
+            border-radius: var(--radius2);
+            min-height: 320px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, .10);
+            box-shadow: var(--shadow2);
+            background: #0d0d12;
+            min-width: 0;
+        }
+
+        .shot::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(700px 360px at 20% 10%, rgba(255, 107, 0, .18), transparent 60%),
+                radial-gradient(700px 360px at 80% 60%, rgba(255, 214, 0, .12), transparent 60%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .shot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: .88;
+            transform: scale(1.02);
+            transition: transform .6s ease, opacity .4s ease;
+            filter: saturate(1.05) contrast(1.02);
+        }
+
+        .shot:hover img {
+            transform: scale(1.08);
+            opacity: .95
+        }
+
+        .shot .cap {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 16px;
+            z-index: 2;
+            border-radius: 18px;
+            padding: 14px 14px;
+        }
+
+        .shot .cap b {
+            display: block;
+            font-family: var(--mono);
+            color: rgba(255, 214, 0, .92);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: .76rem;
+        }
+
+        .shot .cap p {
+            margin-top: 6px;
+            font-family: var(--mono);
+            color: rgba(243, 243, 245, .70);
+            font-size: .86rem;
+            line-height: 1.6;
+        }
+
+        .shot-stack {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 14px;
+            min-height: 320px;
+            min-width: 0;
+        }
+
+        @media (max-width: 980px) {
+            .gallery {
+                grid-template-columns: 1fr
+            }
+
+            .shot-stack {
+                grid-template-rows: auto
+            }
+
+            .shot {
+                min-height: 280px
+            }
+        }
+
+        .events .event {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 170px;
+        }
+
+        .event .date {
+            font-family: var(--mono);
+            font-size: .72rem;
+            letter-spacing: 2.2px;
+            text-transform: uppercase;
+            color: rgba(243, 243, 245, .55);
+        }
+
+        .event h3 {
+            font-size: 1.04rem
+        }
+
+        .event p {
+            font-family: var(--mono);
+            color: rgba(243, 243, 245, .65);
+            font-size: .88rem;
+            line-height: 1.7;
+        }
+
+        .event .meta {
+            margin-top: auto;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-family: var(--mono);
+            font-size: .72rem;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .04);
+            color: rgba(243, 243, 245, .72);
+        }
+
+        .badge.live {
+            border-color: rgba(255, 107, 0, .25);
+            background: rgba(255, 107, 0, .10);
+            color: rgba(255, 107, 0, .95)
+        }
+
+        .badge.new {
+            border-color: rgba(255, 214, 0, .22);
+            background: rgba(255, 214, 0, .08);
+            color: rgba(255, 214, 0, .92)
+        }
+
+        @media (max-width: 980px) {
+            .events .event {
+                grid-column: span 6
+            }
+        }
+
+        @media (max-width: 620px) {
+            .events .event {
+                grid-column: span 12
+            }
+        }
+
+        .faq {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        @media (max-width: 980px) {
+            .faq {
+                grid-template-columns: 1fr
+            }
+        }
+
+        details {
+            border-radius: var(--radius2);
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .10);
+            padding: 14px 16px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, .18);
+            transition: border-color .2s ease, transform .2s ease, background .2s ease;
+        }
+
+        details:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255, 214, 0, .18);
+            background: rgba(255, 255, 255, .06)
+        }
+
+        summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-weight: 700;
+        }
+
+        summary::-webkit-details-marker {
+            display: none
+        }
+
+        summary span {
+            font-family: var(--mono);
+            font-weight: 700;
+            font-size: .9rem;
+            color: rgba(243, 243, 245, .92);
+        }
+
+        summary i {
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
+            background: rgba(255, 107, 0, .10);
+            border: 1px solid rgba(255, 107, 0, .20);
+            display: grid;
+            place-items: center;
+            color: rgba(255, 214, 0, .92);
+            flex-shrink: 0;
+            font-style: normal;
+            font-family: var(--mono);
+            transition: transform .2s ease;
+        }
+
+        details[open] summary i {
+            transform: rotate(45deg);
+        }
+
+        details p {
+            margin-top: 12px;
+            color: rgba(243, 243, 245, .65);
+            font-family: var(--mono);
+            font-size: .88rem;
+            line-height: 1.7;
+        }
+
+        .cta-big {
+            border-radius: 32px;
+            border: 1px solid rgba(255, 255, 255, .10);
+            background: linear-gradient(180deg, rgba(255, 255, 255, .06), rgba(255, 255, 255, .03));
+            box-shadow: var(--shadow);
+            padding: 32px 26px;
+            overflow: hidden;
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr .9fr;
+            align-items: center;
+            gap: 18px;
+            min-width: 0;
+        }
+
+        .cta-big::before {
+            content: "</>";
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13rem;
+            font-family: var(--mono);
+            font-weight: 900;
+            color: rgba(255, 107, 0, .08);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .cta-big h2 {
+            font-size: clamp(1.7rem, 3.5vw, 2.7rem);
+            letter-spacing: -0.02em;
+            font-weight: 800;
+        }
+
+        .cta-big h2 em {
+            color: var(--orange);
+            font-style: normal
+        }
+
+        .cta-big p {
+            margin-top: 10px;
+            color: rgba(243, 243, 245, .65);
+            font-family: var(--mono);
+            line-height: 1.7;
+            font-size: .95rem;
+            max-width: 560px;
+        }
+
+        .cta-right {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (max-width: 980px) {
+            .cta-big {
+                grid-template-columns: 1fr
+            }
+
+            .cta-right {
+                justify-content: flex-start
+            }
+
+            .cta-big::before {
+                display: none
+            }
+        }
+
+        footer {
+            padding: 44px 0 60px;
+            color: rgba(243, 243, 245, .60);
+            font-family: var(--mono);
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            margin-top: 60px;
+        }
+
+        .foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .foot a {
+            color: rgba(255, 214, 0, .90);
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(255, 214, 0, .35);
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity .6s ease, transform .6s ease
+        }
+
+        .reveal.on {
+            opacity: 1;
+            transform: translateY(0)
+        }
+
+        .chatbot-btn {
+            position: fixed;
+            right: calc(22px + var(--safe-r));
+            bottom: calc(22px + var(--safe-b));
+            width: 62px;
+            height: 62px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: linear-gradient(135deg, rgba(255, 107, 0, .95), rgba(255, 214, 0, .92));
+            box-shadow: 0 16px 60px rgba(255, 107, 0, .28);
+            display: grid;
+            place-items: center;
+            font-size: 1.55rem;
+            color: #000;
+            cursor: pointer;
+            z-index: 500;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .chatbot-btn:hover {
+            transform: translateY(-2px) rotate(2deg);
+            box-shadow: 0 22px 70px rgba(255, 107, 0, .34)
+        }
+
+        .notif {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background: #ff3c3c;
+            border-radius: 999px;
+            border: 2px solid rgba(0, 0, 0, .35);
+            box-shadow: 0 0 18px rgba(255, 60, 60, .35);
+            animation: pulse 1.8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1
+            }
+
+            50% {
+                transform: scale(1.35);
+                opacity: .7
+            }
+        }
+
+        .chat-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .55);
+            z-index: 498;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease;
+        }
+
+        .chat-overlay.on {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            body.highfx .chat-overlay {
+                background: rgba(0, 0, 0, .45);
+                backdrop-filter: blur(6px);
+                -webkit-backdrop-filter: blur(6px);
+            }
+        }
+
+        .chat {
+            position: fixed;
+            right: calc(22px + var(--safe-r));
+            bottom: calc(98px + var(--safe-b));
+            width: min(410px, calc(100vw - 44px));
+            height: min(560px, calc(100vh - 160px));
+            border-radius: 26px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            box-shadow: 0 30px 90px rgba(0, 0, 0, .65);
+            overflow: hidden;
+            display: none;
+            z-index: 499;
+            transform-origin: bottom right;
+            background: linear-gradient(180deg, rgba(16, 16, 22, .94), rgba(10, 10, 14, .92));
+        }
+
+        .chat.open {
+            display: flex;
+            flex-direction: column;
+            animation: pop .18s ease;
+        }
+
+        .chat.min {
+            height: 86px;
+        }
+
+        .chat.min .chat-body,
+        .chat.min .chat-sugg,
+        .chat.min .chat-input {
+            display: none;
+        }
+
+        @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+            body.highfx .chat.fx-blur {
+                backdrop-filter: blur(14px);
+                -webkit-backdrop-filter: blur(14px);
+                background: rgba(10, 10, 14, .72);
+            }
+        }
+
+        @keyframes pop {
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(.985)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+
+        .chat-head {
+            padding: 14px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #000;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255, 107, 0, .98), rgba(255, 214, 0, .96));
+        }
+
+        .chat-head::before {
+            content: "";
+            position: absolute;
+            inset: -40px;
+            background:
+                radial-gradient(circle at 20% 20%, rgba(255, 255, 255, .22), transparent 45%),
+                radial-gradient(circle at 80% 60%, rgba(0, 0, 0, .12), transparent 48%);
+            opacity: .5;
+            pointer-events: none;
+        }
+
+        .chat-head>* {
+            position: relative;
+            z-index: 1;
+        }
+
+        .chat-ava {
+            width: 42px;
+            height: 42px;
+            border-radius: 16px;
+            display: grid;
+            place-items: center;
+            background: rgba(0, 0, 0, .16);
+            border: 1px solid rgba(0, 0, 0, .12);
+            font-size: 1.15rem;
+        }
+
+        .chat-title strong {
+            display: block;
+            font-size: .98rem;
+            font-weight: 900;
+            letter-spacing: .2px;
+        }
+
+        .chat-title small {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--mono);
+            opacity: .78;
+            margin-top: 2px;
+        }
+
+        .chat-title .dot {
+            width: 8px;
+            height: 8px;
+            background: rgba(0, 0, 0, .65);
+            border-radius: 999px;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, .15);
+        }
+
+        .chat-tools {
+            margin-left: auto;
+            display: flex;
+            gap: 8px;
+        }
+
+        .iconbtn {
+            width: 38px;
+            height: 38px;
+            border-radius: 14px;
+            border: 1px solid rgba(0, 0, 0, .18);
+            background: rgba(0, 0, 0, .14);
+            color: #000;
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: transform .18s ease, background .18s ease;
+            user-select: none;
+            font-family: var(--mono);
+            font-weight: 900;
+        }
+
+        .iconbtn:hover {
+            transform: translateY(-1px);
+            background: rgba(0, 0, 0, .20);
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 14px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background:
+                radial-gradient(900px 480px at 20% 10%, rgba(255, 107, 0, .08), transparent 60%),
+                radial-gradient(900px 480px at 90% 40%, rgba(255, 214, 0, .06), transparent 60%),
+                linear-gradient(180deg, rgba(0, 0, 0, .10), rgba(0, 0, 0, .00));
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, .18) transparent;
+        }
+
+        .msg {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            animation: msgIn .16s ease;
+        }
+
+        @keyframes msgIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        .msg.me {
+            flex-direction: row-reverse;
+        }
+
+        .mava {
+            width: 30px;
+            height: 30px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: .92rem;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .10);
+            flex-shrink: 0;
+        }
+
+        .msg.bot .mava {
+            background: rgba(255, 107, 0, .16);
+            border-color: rgba(255, 107, 0, .22);
+        }
+
+        .mbubble {
+            max-width: 82%;
+            border-radius: 18px;
+            padding: 10px 12px;
+            border: 1px solid rgba(255, 255, 255, .10);
+            background: rgba(255, 255, 255, .04);
+            color: rgba(243, 243, 245, .92);
+            font-family: var(--mono);
+            font-size: .84rem;
+            line-height: 1.55;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, .22);
+            overflow-wrap: anywhere;
+            position: relative;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .msg.bot .mbubble::after {
+            content: "";
+            position: absolute;
+            left: -6px;
+            bottom: 10px;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, .04);
+            border-left: 1px solid rgba(255, 255, 255, .10);
+            border-bottom: 1px solid rgba(255, 255, 255, .10);
+            transform: rotate(45deg);
+        }
+
+        .msg.me .mbubble {
+            background: linear-gradient(135deg, rgba(255, 107, 0, .98), rgba(255, 214, 0, .96));
+            color: #000;
+            border-color: rgba(0, 0, 0, .12);
+            font-weight: 900;
+        }
+
+        .msg.me .mbubble::after {
+            content: "";
+            position: absolute;
+            right: -6px;
+            bottom: 10px;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 214, 0, .90);
+            border-right: 1px solid rgba(0, 0, 0, .12);
+            border-bottom: 1px solid rgba(0, 0, 0, .12);
+            transform: rotate(45deg);
+        }
+
+        .mmeta {
+            margin-top: 6px;
+            font-size: .70rem;
+            opacity: .55;
+            font-family: var(--mono);
+        }
+
+        .mbubble a {
+            color: var(--yellow);
+            text-decoration: none;
+            border-bottom: 1px dashed rgba(255, 214, 0, .35);
+        }
+
+        .msg.me .mbubble a {
+            color: #000;
+            border-bottom-color: rgba(0, 0, 0, .35);
+        }
+
+        .typing {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing i {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(243, 243, 245, .75);
+            display: inline-block;
+            animation: bop 1.1s infinite ease-in-out;
+        }
+
+        .typing i:nth-child(2) {
+            animation-delay: .12s;
+            opacity: .85;
+        }
+
+        .typing i:nth-child(3) {
+            animation-delay: .24s;
+            opacity: .7;
+        }
+
+        @keyframes bop {
+
+            0%,
+            100% {
+                transform: translateY(0);
+                opacity: .55
+            }
+
+            50% {
+                transform: translateY(-4px);
+                opacity: 1
+            }
+        }
+
+        .chat-sugg {
+            padding: 0 14px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .sugg {
+            border-radius: 999px;
+            padding: 8px 10px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .04);
+            color: rgba(243, 243, 245, .80);
+            font-family: var(--mono);
+            font-size: .74rem;
+            cursor: pointer;
+            transition: transform .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+            user-select: none;
+        }
+
+        .sugg:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255, 214, 0, .22);
+            background: rgba(255, 214, 0, .08);
+            color: rgba(255, 214, 0, .92);
+        }
+
+        .chat-input {
+            padding: 12px 12px;
+            border-top: 1px solid rgba(255, 255, 255, .08);
+            background: rgba(0, 0, 0, .22);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .chat-input input {
+            flex: 1;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .04);
+            color: rgba(243, 243, 245, .92);
+            padding: 12px 12px;
+            font-family: var(--mono);
+            font-size: .84rem;
+            outline: none;
+            transition: border-color .18s ease, background .18s ease;
+            min-width: 0;
+        }
+
+        .chat-input input:focus {
+            border-color: rgba(255, 107, 0, .35);
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .send {
+            width: 44px;
+            height: 44px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 107, 0, .40);
+            background: rgba(255, 107, 0, .18);
+            color: rgba(255, 214, 0, .92);
+            display: grid;
+            place-items: center;
+            cursor: pointer;
+            transition: transform .2s ease, background .2s ease, border-color .2s ease;
+            font-family: var(--mono);
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .send:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 214, 0, .14);
+            border-color: rgba(255, 214, 0, .38);
+        }
+
+        @media (max-width: 520px) {
+            .chat {
+                right: calc(12px + var(--safe-r));
+                bottom: calc(86px + var(--safe-b));
+                width: calc(100vw - 24px);
+                height: min(610px, calc(100vh - 140px));
+                border-radius: 22px;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            left: 50%;
+            bottom: calc(24px + var(--safe-b));
+            transform: translateX(-50%);
+            border-radius: 999px;
+            padding: 10px 14px;
+            color: rgba(243, 243, 245, .92);
+            font-family: var(--mono);
+            font-size: .82rem;
+            box-shadow: 0 22px 70px rgba(0, 0, 0, .45);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .25s ease, transform .25s ease;
+            z-index: 800;
+            white-space: nowrap;
+        }
+
+        .toast.on {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-6px)
+        }
+    </style>
+</head>
+
+<body>
+    <a class="skip" href="#mainContent">Pular para o conteúdo</a>
+    <div class="progress" id="progress"></div>
+    <div class="noise"></div>
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+    <header>
+        <div class="wrap">
+            <nav class="glass" aria-label="Navegação principal">
+                <a class="brand" href="#top" aria-label="Voltar ao topo">
+                    <div class="brand-badge">&lt;/&gt;</div>
+                    <span>DEVS HUB</span>
+                </a>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#top">Home</a></li>
+                    <li><a href="#features">Recursos</a></li>
+                    <li><a href="#events">Eventos</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="https://discord.gg/pMyzUsmDHw" target="_blank" rel="noopener noreferrer">Comunidade</a>
+                    </li>
+                </ul>
+                <div class="nav-actions">
+                    <button class="pill hamb" id="openMenu" type="button" aria-controls="mwrap"
+                        aria-expanded="false">MENU</button>
+                    <button class="pill" id="togglePerf" type="button" title="Ativar/Desativar modo leve">LEVE</button>
+                    <button class="pill" id="copyInvite" type="button">COPIAR LINK</button>
+                    <a class="cta" href="https://discord.gg/pMyzUsmDHw" target="_blank"
+                        rel="noopener noreferrer"><span>Entrar</span></a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    <div class="mwrap" id="mwrap" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="wrap">
+            <div class="mmenu glass">
+                <div class="toprow">
+                    <b>MENU</b>
+                    <button class="closem" id="closeMenu" type="button" aria-label="Fechar menu">×</button>
+                </div>
+                <a href="#top">Home <span>➜</span></a>
+                <a href="#features">Recursos <span>➜</span></a>
+                <a href="#events">Eventos <span>➜</span></a>
+                <a href="#faq">FAQ <span>➜</span></a>
+                <a href="https://discord.gg/pMyzUsmDHw" target="_blank" rel="noopener noreferrer">Entrar no Discord
+                    <span>↗</span></a>
+            </div>
+        </div>
+    </div>
+    <main id="mainContent">
+        <div id="top"></div>
+        <section class="hero">
+            <canvas id="bgCanvas"></canvas>
+            <div class="wrap">
+                <div class="hero-grid">
+                    <div>
+                        <div class="tag reveal"><i></i> servidor gratuito · comunidade ativa · suporte 24/7</div>
+                        <h1 class="reveal">
+                            O melhor lugar pra você
+                            <span class="h1-outline">virar dev de verdade.</span>
+                        </h1>
+                        <p class="lead reveal">
+                            Trilhas do zero ao avançado, desafios reais, mentoria ao vivo e uma galera que ajuda sem
+                            frescura.
+                            Entrou no Discord e já começa a evoluir.
+                        </p>
+                        <div class="hero-actions reveal">
+                            <a class="btn btn-primary" href="https://discord.gg/pMyzUsmDHw" target="_blank"
+                                rel="noopener noreferrer">
+                                <span>Entrar no Servidor</span>
+                                <span aria-hidden="true">➜</span>
+                            </a>
+                            <a class="btn btn-secondary" href="#features">
+                                Ver recursos
+                                <span aria-hidden="true">✨</span>
+                            </a>
+                            <button class="btn btn-ghost" id="scrollDown" type="button">
+                                ver por dentro
+                                <span aria-hidden="true">↓</span>
+                            </button>
+                        </div>
+                        <div class="mini reveal">
+                            <span>Link:</span>
+                            <code>discord.gg/pMyzUsmDHw</code>
+                            <span>·</span>
+                            <span>Sem paywall, sem enrolação.</span>
+                        </div>
+                        <div class="stats reveal">
+                            <div class="stat">
+                                <b id="statMembers">500+</b>
+                                <span>Membros</span>
+                            </div>
+                            <div class="stat">
+                                <b id="statOnline">24/7</b>
+                                <span>Online / Ajuda</span>
+                            </div>
+                            <div class="stat">
+                                <b>100%</b>
+                                <span>Gratuito</span>
+                            </div>
+                            <div class="stat">
+                                <b>50+</b>
+                                <span>Tutoriais</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-visual reveal" aria-hidden="true">
+                        <div class="code-glow"></div>
+                        <div class="code-panel glass">
+                            <div class="dots"><b></b><b></b><b></b></div>
+                            <div class="code">
+                                <span class="c">// seu primeiro push? bora.</span>
+                                <span class="k">const</span> <span class="p">dev</span> = <span
+                                    class="s">"você"</span><span class="p">;</span>
+                                <span class="k">const</span> <span class="p">server</span> = <span class="s">"Devs
+                                    Hub"</span><span class="p">;</span>
+                                <span class="k">function</span> <span class="b">nextLevel</span><span
+                                    class="p">()</span> <span class="p">{</span>
+                                <span class="k">return</span> <span class="s">"projetos + mentoria +
+                                    desafios"</span><span class="p">;</span>
+                                <span class="p">}</span>
+                                <span class="p">console.log(</span><span class="s">`Bem-vindo(a), ${dev}!`</span><span
+                                    class="p">)</span>
+                                <span class="p">console.log(</span><span class="s">`Agora: ${nextLevel()}`</span><span
+                                    class="p">)</span>
+                            </div>
+                        </div>
+                        <div class="hero-cards">
+                            <div class="tiny">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                    <path d="M7 8l-3 4 3 4" stroke="rgba(255,214,0,.95)" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M17 8l3 4-3 4" stroke="rgba(255,107,0,.95)" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round" />
+                                    <path d="M14 6l-4 12" stroke="rgba(243,243,245,.75)" stroke-width="2"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <div>
+                                    <h4>Trilhas + Projetos</h4>
+                                    <p>Aprenda construindo: sites, bots, APIs, dashboards e mais.</p>
+                                </div>
+                            </div>
+                            <div class="tiny">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                    <path d="M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3 3-7z" stroke="rgba(255,214,0,.95)"
+                                        stroke-width="2" stroke-linejoin="round" />
+                                </svg>
+                                <div>
+                                    <h4>Mentoria ao vivo</h4>
+                                    <p>Q&A, review de código e direcionamento sem humilhação.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="features">
+            <div class="wrap">
+                <div class="section-head">
+                    <div>
+                        <div class="kicker reveal">/ por que entrar</div>
+                        <div class="title reveal">Tudo que você precisa pra <em>começar</em> e não parar.</div>
+                        <p class="sub reveal">
+                            Organização, conteúdo e comunidade de verdade. Você entra, escolhe uma trilha e já tem um
+                            caminho claro.
+                        </p>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="card feat reveal">
+                        <div class="icon" title="Mentoria">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M12 3a7 7 0 0 0-7 7v4a4 4 0 0 0 4 4h1" stroke="rgba(255,214,0,.95)"
+                                    stroke-width="2" stroke-linecap="round" />
+                                <path d="M12 3a7 7 0 0 1 7 7v4a4 4 0 0 1-4 4h-1" stroke="rgba(255,107,0,.95)"
+                                    stroke-width="2" stroke-linecap="round" />
+                                <path d="M9 21h6" stroke="rgba(243,243,245,.75)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <h3>Mentorias ao vivo</h3>
+                        <p>Call pra tirar dúvidas, revisar projeto e entender o “porquê” do código.</p>
+                        <div class="chips">
+                            <span class="chip hot">Q&A</span>
+                            <span class="chip">review</span>
+                            <span class="chip">carreira</span>
+                        </div>
+                    </div>
+                    <div class="card feat reveal">
+                        <div class="icon" title="Trilhas">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M6 3h12v18H6z" stroke="rgba(255,214,0,.95)" stroke-width="2" />
+                                <path d="M9 7h6M9 11h6M9 15h6" stroke="rgba(243,243,245,.75)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <h3>Trilhas organizadas</h3>
+                        <p>HTML/CSS, JavaScript, Python, Node, React e muito mais — do zero.</p>
+                        <div class="chips">
+                            <span class="chip">iniciante</span>
+                            <span class="chip hot">do zero</span>
+                            <span class="chip">avançado</span>
+                        </div>
+                    </div>
+                    <div class="card feat reveal">
+                        <div class="icon" title="Comunidade">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M16 11a4 4 0 1 0-8 0" stroke="rgba(255,214,0,.95)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <path d="M4 21a8 8 0 0 1 16 0" stroke="rgba(255,107,0,.95)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <h3>Comunidade ativa</h3>
+                        <p>Dev ajudando dev: dúvida rápida, print de erro, feedback de projeto e networking.</p>
+                        <div class="chips">
+                            <span class="chip">suporte</span>
+                            <span class="chip">network</span>
+                            <span class="chip hot">sem toxicidade</span>
+                        </div>
+                    </div>
+                    <div class="card feat reveal">
+                        <div class="icon" title="Desafios">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M8 21h8" stroke="rgba(243,243,245,.75)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <path d="M12 17V3" stroke="rgba(255,214,0,.95)" stroke-width="2"
+                                    stroke-linecap="round" />
+                                <path d="M7 7h10" stroke="rgba(255,107,0,.95)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <h3>Projetos práticos</h3>
+                        <p>Desafios semanais e ideias de projetos pra você montar portfólio de verdade.</p>
+                        <div class="chips">
+                            <span class="chip hot">portfólio</span>
+                            <span class="chip">feedback</span>
+                            <span class="chip">evolução</span>
+                        </div>
+                    </div>
+                    <div class="card feat reveal">
+                        <div class="icon" title="Bots e APIs">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M9 9h6v6H9z" stroke="rgba(255,214,0,.95)" stroke-width="2" />
+                                <path d="M4 12h3M17 12h3M12 4v3M12 17v3" stroke="rgba(243,243,245,.75)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <h3>Conteúdo “mão na massa”</h3>
+                        <p>Bots no Discord, APIs, banco de dados, autenticação, deploy e boas práticas.</p>
+                        <div class="chips">
+                            <span class="chip">node</span>
+                            <span class="chip hot">discord.js</span>
+                            <span class="chip">mysql</span>
+                        </div>
+                    </div>
+                    <div class="card feat reveal">
+                        <div class="icon" title="Carreira">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                                <path d="M4 7h16v13H4z" stroke="rgba(255,214,0,.95)" stroke-width="2" />
+                                <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="rgba(255,107,0,.95)"
+                                    stroke-width="2" stroke-linecap="round" />
+                                <path d="M4 12h16" stroke="rgba(243,243,245,.75)" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </div>
+                        <h3>Direção e carreira</h3>
+                        <p>Como estudar, montar GitHub, organizar portfólio e se preparar pra oportunidades.</p>
+                        <div class="chips">
+                            <span class="chip">github</span>
+                            <span class="chip">currículo</span>
+                            <span class="chip hot">roadmap</span>
+                        </div>
+                    </div>
+                    <div class="gallery reveal">
+                        <div class="shot">
+                            <img alt="Workspace de programação" loading="lazy" decoding="async"
+                                src="https://images.unsplash.com/photo-1515879218367-8466d910aaa4?auto=format&fit=crop&w=1400&q=60" />
+                            <div class="cap glass">
+                                <b>Ambiente bonito + organizado</b>
+                                <p>Canais claros, trilhas e recursos. Sem bagunça e sem poluição visual.</p>
+                            </div>
+                        </div>
+                        <div class="shot-stack">
+                            <div class="shot">
+                                <img alt="Código na tela" loading="lazy" decoding="async"
+                                    src="https://images.unsplash.com/photo-1516259762381-22954d7d3ad2?auto=format&fit=crop&w=1400&q=60" />
+                                <div class="cap glass">
+                                    <b>Aprenda fazendo</b>
+                                    <p>Projetos pequenos, médios e grandes — com evolução constante.</p>
+                                </div>
+                            </div>
+                            <div class="shot">
+                                <img alt="Comunidade conversando" loading="lazy" decoding="async"
+                                    src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1400&q=60" />
+                                <div class="cap glass">
+                                    <b>Comunidade que ajuda</b>
+                                    <p>Suporte real no chat + feedback sem julgamento.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="events" class="events">
+            <div class="wrap">
+                <div class="section-head">
+                    <div>
+                        <div class="kicker reveal">/ agenda</div>
+                        <div class="title reveal">Eventos pra manter o ritmo <em>lá em cima</em>.</div>
+                        <p class="sub reveal">Ideias de eventos que deixam o servidor vivo e sua evolução constante.</p>
+                    </div>
+                </div>
+                <div class="grid">
+                    <div class="card event reveal">
+                        <div class="date">Toda semana</div>
+                        <h3>Desafio de projeto</h3>
+                        <p>Um tema por semana (landing, API, bot). Quem participa ganha feedback e melhora muito mais
+                            rápido.</p>
+                        <div class="meta">
+                            <span class="badge new">portfólio</span>
+                            <span class="badge">iniciante friendly</span>
+                        </div>
+                    </div>
+                    <div class="card event reveal">
+                        <div class="date">Ao vivo</div>
+                        <h3>Mentoria / Review</h3>
+                        <p>Call rápida pra revisar código e te dar o próximo passo exato. Sem enrolação.</p>
+                        <div class="meta">
+                            <span class="badge live">live</span>
+                            <span class="badge">review</span>
+                        </div>
+                    </div>
+                    <div class="card event reveal">
+                        <div class="date">Sempre</div>
+                        <h3>Plantão de dúvidas</h3>
+                        <p>Caiu num erro? Manda print/log. A comunidade ajuda e você aprende o raciocínio junto.</p>
+                        <div class="meta">
+                            <span class="badge">suporte</span>
+                            <span class="badge new">evolução</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="faq">
+            <div class="wrap">
+                <div class="section-head">
+                    <div>
+                        <div class="kicker reveal">/ perguntas</div>
+                        <div class="title reveal">FAQ — sem mistério.</div>
+                        <p class="sub reveal">Respostas rápidas pras dúvidas mais comuns.</p>
+                    </div>
+                </div>
+                <div class="faq reveal">
+                    <details>
+                        <summary><span>É realmente gratuito?</span><i>+</i></summary>
+                        <p>Sim. Você entra, participa e aprende sem pagar nada. O foco é comunidade e evolução.</p>
+                    </details>
+                    <details>
+                        <summary><span>O que dá pra aprender lá?</span><i>+</i></summary>
+                        <p>HTML/CSS, JavaScript, Python, Node.js, React, bots no Discord, APIs e boas práticas de dev.
+                        </p>
+                    </details>
+                    <details>
+                        <summary><span>Sou iniciante total, tem espaço?</span><i>+</i></summary>
+                        <p>Tem sim. Trilhas do zero e um jeito bem direto de tirar dúvidas, sem te ridicularizar.</p>
+                    </details>
+                    <details>
+                        <summary><span>Como eu entro?</span><i>+</i></summary>
+                        <p>É só clicar no link do Discord:
+                            <a href="https://discord.gg/pMyzUsmDHw" target="_blank"
+                                rel="noopener noreferrer">discord.gg/pMyzUsmDHw</a>.
+                        </p>
+                    </details>
+                </div>
+            </div>
+        </section>
+        <section>
+            <div class="wrap">
+                <div class="cta-big reveal">
+                    <div>
+                        <h2>Pronto pra <em>codar</em> hoje?</h2>
+                        <p>Entra no Devs Hub, escolhe uma trilha e começa. Se travar, chama — a comunidade não te deixa
+                            sozinho.</p>
+                    </div>
+                    <div class="cta-right">
+                        <a class="btn btn-primary" href="https://discord.gg/pMyzUsmDHw" target="_blank"
+                            rel="noopener noreferrer">
+                            <span>Entrar no Discord</span> ➜
+                        </a>
+                        <button class="btn btn-secondary" id="copyInvite2" type="button">Copiar link</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="wrap">
+                <div class="foot">
+                    <div>© 2026 Devs Hub — Feito com carinho.</div>
+                    <div>
+                        <a href="https://discord.gg/pMyzUsmDHw" target="_blank"
+                            rel="noopener noreferrer">discord.gg/pMyzUsmDHw</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+    <button class="chatbot-btn" id="chatBtn" aria-label="Abrir chat" aria-expanded="false" type="button">
+        <span aria-hidden="true">🤖</span>
+        <span class="notif" id="notif"></span>
+    </button>
+    <div class="chat-overlay" id="chatOverlay" hidden></div>
+    <div class="chat fx-blur" id="chat" role="dialog" aria-modal="false" aria-label="Chat do Devs Hub">
+        <div class="chat-head">
+            <div class="chat-ava" aria-hidden="true">🤖</div>
+            <div class="chat-title">
+                <strong>Devs Hub Assistant</strong>
+                <small><span class="dot"></span> online agora • digita “/help”</small>
+            </div>
+            <div class="chat-tools">
+                <button class="iconbtn" id="chatMin" title="Minimizar" type="button"
+                    aria-label="Minimizar chat">–</button>
+                <button class="iconbtn" id="chatClear" title="Limpar" type="button" aria-label="Limpar chat">C</button>
+                <button class="iconbtn" id="chatClose" title="Fechar" type="button" aria-label="Fechar chat">×</button>
+            </div>
+        </div>
+        <div class="chat-body" id="chatBody" aria-live="polite"></div>
+        <div class="chat-sugg" id="chatSugg" aria-label="Sugestões rápidas">
+            <button class="sugg" data-q="/link">Pegar link</button>
+            <button class="sugg" data-q="/trilhas">Ver trilhas</button>
+            <button class="sugg" data-q="/eventos">Eventos</button>
+            <button class="sugg" data-q="/mentoria">Mentoria</button>
+            <button class="sugg" data-q="/regras">Regras</button>
+        </div>
+        <div class="chat-input">
+            <input id="chatInput" type="text" placeholder="Digite sua pergunta… (ex: /trilhas)" autocomplete="off"
+                maxlength="220" />
+            <button class="send" id="chatSend" aria-label="Enviar" type="button">➜</button>
+        </div>
+    </div>
+    <div class="toast glass" id="toast" role="status" aria-live="polite">Copiado!</div>
+    <script>
+        const INVITE = "https://discord.gg/pMyzUsmDHw";
+        const INVITE_CODE = "pMyzUsmDHw";
+        const $ = (q) => document.querySelector(q);
+        const toast = $("#toast");
+        const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+        function showToast(text) {
+            toast.textContent = text;
+            toast.classList.add("on");
+            clearTimeout(showToast._t);
+            showToast._t = setTimeout(() => toast.classList.remove("on"), 1200);
+        }
+
+        const progress = $("#progress");
+        window.addEventListener("scroll", () => {
+            const h = document.documentElement;
+            const sc = h.scrollTop || document.body.scrollTop;
+            const max = (h.scrollHeight - h.clientHeight) || 1;
+            progress.style.width = Math.min(100, (sc / max) * 100) + "%";
+        }, { passive: true });
+
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((e) => {
+                if (e.isIntersecting) e.target.classList.add("on");
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll(".reveal").forEach(el => io.observe(el));
+        (function scrollSpy() {
+            const links = Array.from(document.querySelectorAll(".nav-links a[href^='#']"));
+            const sections = links
+                .map(a => document.querySelector(a.getAttribute("href")))
+                .filter(Boolean);
+
+            if (!links.length || !sections.length) return;
+
+            const spy = new IntersectionObserver((entries) => {
+                const vis = entries.filter(e => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]; // sa porra aq e chata para umn caralhoooo!
+                if (!vis) return;
+
+                links.forEach(a => a.removeAttribute("aria-current"));
+                const active = links.find(a => a.getAttribute("href") === "#" + vis.target.id);
+                if (active) active.setAttribute("aria-current", "page");
+            }, { threshold: [0.25, 0.5, 0.7] });
+
+            sections.forEach(s => spy.observe(s));
+        })();
+
+        const cursor = $("#cursor");
+        const ring = $("#cursorRing");
+        let mx = 0, my = 0, rx = 0, ry = 0;
+
+        function usingMouse() {
+            return window.matchMedia && window.matchMedia("(pointer: fine)").matches && !prefersReducedMotion.matches;
+        }
+
+        document.addEventListener("mousemove", (e) => {
+            if (!usingMouse()) return;
+            mx = e.clientX; my = e.clientY;
+            cursor.style.left = mx + "px";
+            cursor.style.top = my + "px";
+        }, { passive: true });
+
+        function animateRing() {
+            if (usingMouse()) {
+                rx += (mx - rx) * 0.14;
+                ry += (my - ry) * 0.14;
+                ring.style.left = rx + "px";
+                ring.style.top = ry + "px";
+            }
+            requestAnimationFrame(animateRing);
+        }
+        animateRing();
+
+        function hoverFX(enable) {
+            if (!usingMouse()) return;
+            cursor.style.transform = enable ? "translate(-50%,-50%) scale(2.4)" : "translate(-50%,-50%) scale(1)";
+            ring.style.opacity = enable ? "0.35" : "0.95";
+            ring.style.transform = enable ? "translate(-50%,-50%) scale(1.08)" : "translate(-50%,-50%) scale(1)";
+        }
+
+        document.addEventListener("mouseover", (e) => {
+            const hit = e.target.closest("a, button, summary, input");
+            hoverFX(!!hit);
+        });
+
+        async function copyInvite() {
+            try {
+                await navigator.clipboard.writeText(INVITE);
+                showToast("Link copiado!");
+            } catch {
+                const ta = document.createElement("textarea");
+                ta.value = INVITE;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand("copy");
+                ta.remove();
+                showToast("Link copiado!");
+            }
+        }
+        $("#copyInvite")?.addEventListener("click", copyInvite);
+        $("#copyInvite2")?.addEventListener("click", copyInvite);
+
+        $("#scrollDown")?.addEventListener("click", () => {
+            const el = $("#features");
+            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        const mwrap = $("#mwrap");
+        const openMenu = $("#openMenu");
+        const closeMenu = $("#closeMenu");
+        let lastFocus = null;
+
+        function setBodyLock(on) {
+            document.body.classList.toggle("lock", !!on);
+        }
+
+        function openMobileMenu() {
+            lastFocus = document.activeElement;
+            mwrap.classList.add("open");
+            mwrap.setAttribute("aria-hidden", "false");
+            openMenu?.setAttribute("aria-expanded", "true");
+            setBodyLock(true);
+
+            const first = mwrap.querySelector("button, a");
+            first?.focus?.();
+        }
+
+        function closeMobileMenu() {
+            mwrap.classList.remove("open");
+            mwrap.setAttribute("aria-hidden", "true");
+            openMenu?.setAttribute("aria-expanded", "false");
+            setBodyLock(false);
+            lastFocus?.focus?.();
+        }
+
+        openMenu?.addEventListener("click", openMobileMenu);
+        closeMenu?.addEventListener("click", closeMobileMenu);
+
+        mwrap?.addEventListener("click", (e) => {
+            if (e.target === mwrap) closeMobileMenu();
+        });
+
+        mwrap?.addEventListener("click", (e) => {
+            const a = e.target.closest("a");
+            if (!a) return;
+            closeMobileMenu();
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeMobileMenu();
+        });
+
+        function supportsBackdrop() {
+            // queria muito tirar essa merda mais porra, como tem o botão para mostrar os 2 tipos, pensei em n tirar, ent pau no cu de qquem ta lendo isso!
+            try {
+                return !!(window.CSS && CSS.supports && (CSS.supports("backdrop-filter: blur(2px)") || CSS.supports("-webkit-backdrop-filter: blur(2px)")));
+            } catch {
+                return false;
+            }
+        }
+
+        function updateFXProfile() {
+            const dm = navigator.deviceMemory || 0;
+            const hc = navigator.hardwareConcurrency || 0;
+            const saveData = navigator.connection && navigator.connection.saveData;
+
+            const coarse = window.matchMedia("(pointer: coarse)").matches;
+            const small = window.innerWidth < 620;
+
+            const low =
+                prefersReducedMotion.matches ||
+                !!saveData ||
+                document.body.classList.contains("perf") ||
+                (dm && dm <= 4) ||
+                (hc && hc <= 4) ||
+                coarse ||
+                small;
+
+            document.body.classList.toggle("lowfx", low);
+            document.body.classList.toggle("highfx", !low && supportsBackdrop());
+        }
+
+        const PERF_KEY = "devshub_perf";
+        const togglePerf = $("#togglePerf");
+
+        function detectLowEndForPerf() {
+            const dm = navigator.deviceMemory || 8;
+            const hc = navigator.hardwareConcurrency || 8;
+            const saveData = navigator.connection && navigator.connection.saveData;
+            const coarse = window.matchMedia("(pointer: coarse)").matches;
+            return !!saveData || dm <= 4 || hc <= 4 || coarse || window.innerWidth < 620;
+        }
+
+        function setPerf(on, reason) {
+            document.body.classList.toggle("perf", !!on);
+            togglePerf?.classList.toggle("on", !!on);
+            localStorage.setItem(PERF_KEY, on ? "1" : "0");
+            if (reason) showToast(reason);
+
+            updateFXProfile();
+
+            requestAnimationFrame(() => {
+                resizeCanvas();
+                initParticles();
+                startCanvas();
+            });
+        }
+
+        const savedPerf = localStorage.getItem(PERF_KEY);
+        if (savedPerf === "1") setPerf(true);
+        else if (savedPerf === "0") setPerf(false);
+        else if (detectLowEndForPerf()) setPerf(true, "Modo leve ativado automaticamente ✨");
+        else setPerf(false);
+
+        togglePerf?.addEventListener("click", () => {
+            const on = !document.body.classList.contains("perf");
+            setPerf(on, on ? "Modo leve ativado" : "Modo leve desativado");
+        });
+
+        const canvas = $("#bgCanvas");
+        const hero = document.querySelector(".hero");
+        const ctx = canvas.getContext("2d", { alpha: true });
+
+        let particles = [];
+        let raf = 0;
+        let running = false;
+
+        function resizeCanvas() {
+            const dpr = Math.min(2, window.devicePixelRatio || 1);
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = Math.floor(rect.width * dpr);
+            canvas.height = Math.floor(rect.height * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function initParticles() {
+            const w = canvas.clientWidth || canvas.getBoundingClientRect().width;
+            const h = canvas.clientHeight || canvas.getBoundingClientRect().height;
+
+            const base = Math.floor((w * h) / (document.body.classList.contains("perf") ? 26000 : 18000));
+            const cap = document.body.classList.contains("perf") ? 34 : 54;
+            const count = Math.max(18, Math.min(cap, base));
+
+            particles = [];
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * w,
+                    y: Math.random() * h,
+                    vx: (Math.random() - 0.5) * (document.body.classList.contains("perf") ? 0.26 : 0.35),
+                    vy: (Math.random() - 0.5) * (document.body.classList.contains("perf") ? 0.26 : 0.35),
+                    r: 1 + Math.random() * (document.body.classList.contains("perf") ? 1.1 : 1.3) // queria usar o chart.js, mais a preguiça de de ler documentação n tava deixando...
+                });
+            }
+        }
+
+        function frame() {
+            if (!running) return;
+            if (prefersReducedMotion.matches) return;
+
+            const w = canvas.clientWidth;
+            const h = canvas.clientHeight;
+            ctx.clearRect(0, 0, w, h);
+
+            const g = ctx.createRadialGradient(w * 0.5, h * 0.2, 40, w * 0.5, h * 0.2, w * 0.9);
+            g.addColorStop(0, "rgba(255,214,0,0.06)");
+            g.addColorStop(0.35, "rgba(255,107,0,0.04)");
+            g.addColorStop(1, "rgba(0,0,0,0)");
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, w, h);
+
+            for (const p of particles) {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < -20) p.x = w + 20;
+                if (p.x > w + 20) p.x = -20;
+                if (p.y < -20) p.y = h + 20;
+                if (p.y > h + 20) p.y = -20;
+            }
+
+            const linkDist = document.body.classList.contains("perf") ? 98 : 120;
+
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const a = particles[i], b = particles[j];
+                    const dx = a.x - b.x, dy = a.y - b.y;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < linkDist) {
+                        const alpha = (1 - d / linkDist) * (document.body.classList.contains("perf") ? 0.12 : 0.18);
+                        ctx.strokeStyle = `rgba(255,214,0,${alpha})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            for (const p of particles) {
+                ctx.fillStyle = "rgba(255,107,0,0.55)";
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill(); // porra de particylar e contado!
+            }
+
+            raf = requestAnimationFrame(frame);
+        }
+
+        function startCanvas() {
+            if (running) return;
+            running = true;
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(frame);
+        }
+
+        function stopCanvas() {
+            running = false;
+            cancelAnimationFrame(raf);
+        }
+
+        function setupCanvas() {
+            resizeCanvas();
+            initParticles();
+            startCanvas();
+        }
+
+        // pausa quando hero sai da tela
+        if (hero) {
+            const heroObs = new IntersectionObserver((entries) => {
+                const vis = entries[0]?.isIntersecting;
+                if (!vis) stopCanvas();
+                else startCanvas();
+            }, { threshold: 0.02 });
+            heroObs.observe(hero);
+        }
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) stopCanvas();
+            else startCanvas();
+        });
+
+        window.addEventListener("resize", () => {
+            updateFXProfile();
+            resizeCanvas();
+            initParticles();
+        }, { passive: true });
+
+        setupCanvas();
+        updateFXProfile();
+
+        // pode ter crtz, no futuro sa bonba aaq vai ser por ia, sa merda de chat bot com promit pronto e uma bosta...
+        // as msgs foi o gpt q gerou, pq mo trampo escrever essas mensagens do karai ai, eu sem ideia dq fazer
+
+        const chatBtn = $("#chatBtn");
+        const chat = $("#chat");
+        const chatOverlay = $("#chatOverlay");
+        const notif = $("#notif");
+        const chatBody = $("#chatBody");
+        const chatInput = $("#chatInput");
+        const chatSend = $("#chatSend");
+        const chatSugg = $("#chatSugg");
+        const LS_KEY = "devshub_chat_v3";
+
+        function nowTime() {
+            const d = new Date();
+            return d.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        }
+
+        function linkifyToFragment(text) {
+            const frag = document.createDocumentFragment();
+            const re = /(https?:\/\/[^\s]+)/g;
+            let last = 0;
+            let m;
+
+            while ((m = re.exec(text)) !== null) {
+                const url = m[0];
+                frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+
+                const a = document.createElement("a");
+                a.href = url;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                a.textContent = url.replace(/^https?:\/\//, "");
+                frag.appendChild(a);
+
+                last = m.index + url.length;
+            }
+
+            frag.appendChild(document.createTextNode(text.slice(last)));
+            return frag;
+        }
+
+        let restoring = false;
+
+        function persistChat() {
+            if (restoring) return;
+            try {
+                const items = [];
+                chatBody.querySelectorAll(".msg").forEach((m) => {
+                    const who = m.classList.contains("bot") ? "bot" : "me";
+                    const bubble = m.querySelector(".mbubble");
+                    if (!bubble) return;
+
+                    const clone = bubble.cloneNode(true);
+                    const meta = clone.querySelector(".mmeta");
+                    if (meta) meta.remove();
+
+                    items.push({ who, text: clone.textContent.trim() });
+                });
+                localStorage.setItem(LS_KEY, JSON.stringify(items.slice(-80)));
+            } catch { }
+        }
+
+        function addMsg(text, who, { html = false } = {}) {
+            const row = document.createElement("div");
+            row.className = `msg ${who}`;
+
+            const av = document.createElement("div");
+            av.className = "mava";
+            av.textContent = who === "bot" ? "🤖" : "👤";
+
+            const bubble = document.createElement("div");
+            bubble.className = "mbubble";
+
+            if (html) {
+                bubble.innerHTML = text;
+            } else {
+                bubble.appendChild(linkifyToFragment(String(text)));
+            }
+
+            const meta = document.createElement("div");
+            meta.className = "mmeta";
+            meta.textContent = nowTime();
+            bubble.appendChild(meta);
+            row.appendChild(av);
+            row.appendChild(bubble);
+            chatBody.appendChild(row);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            persistChat();
+        }
+
+        function addTyping() {
+            const row = document.createElement("div");
+            row.className = "msg bot";
+            row.innerHTML = `
+        <div class="mava">🤖</div>
+        <div class="mbubble">
+          <span class="typing" aria-label="digitando">
+            <i></i><i></i><i></i>
+          </span>
+          <div class="mmeta">${nowTime()}</div>
+        </div>
+      `;
+            chatBody.appendChild(row);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            return row;
+        }
+
+        function normalize(q) {
+            return (q || "")
+                .toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[?!.,;:()[\]{}"]/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+
+        const COMMANDS = {
+            "/help": () => (
+                `Comandos rápidos:
+• /link → pega o convite
+• /trilhas → trilhas e por onde começar
+• /stack → o que estudar (JS/Python/etc)
+• /eventos → como funcionam desafios/mentorias
+• /mentoria → como participar
+• /canais → onde tirar dúvidas
+• /regras → regras de convivência
+• /limpar → limpa o chat
+
+Dica: também pode perguntar normal, tipo “sou iniciante, começo por onde?”`
+            ),
+
+            "/link": () => `Convite do Devs Hub: ${INVITE}\nSe quiser, eu também copio: digite /copy`,
+
+            "/copy": async () => {
+                try {
+                    await navigator.clipboard.writeText(INVITE);
+                    showToast("Link copiado!");
+                    return "Pronto! Link copiado pra sua área de transferência ✅";
+                } catch {
+                    return `Não consegui copiar automaticamente aqui 😅 mas tá na mão: ${INVITE}`;
+                }
+            },
+
+            "/trilhas": () => (
+                `Trilhas (bem direto):
+1) Iniciante total → HTML/CSS → JS básico → projetos pequenos
+2) Web/Back-end → Node.js + Express → banco de dados → APIs
+3) Front-end → JS → React → consumo de APIs
+4) Python → lógica → automações → APIs (FastAPI/Flask)
+
+Me diz: você quer seguir (1) iniciante, (2) back, (3) front ou (4) python?`
+            ),
+
+            "/stack": () => (
+                `Stacks que a galera mais usa lá:
+• Web: HTML/CSS + JavaScript
+• Back-end: Node.js + Express + MySQL/Postgres
+• Front-end: React
+• Automação: Python
+
+Quer qual foco: “web”, “back”, “front” ou “python”?`
+            ),
+
+            "/eventos": () => (
+                `Eventos comuns no Devs Hub:
+• Desafio semanal (tema + feedback)
+• Review ao vivo (call)
+• Plantão de dúvidas (chat)
+
+Quer participar de desafio ou prefere mentoria/review primeiro?`
+            ),
+
+            "/mentoria": () => (
+                `Mentoria/Review:
+• você manda sua dúvida/código
+• a gente te dá o próximo passo (sem enrolar)
+• dá pra ir mesmo sendo iniciante
+
+Pergunta: você quer review de projeto ou tirar dúvidas de estudo?`
+            ),
+
+            "/canais": () => (
+                `Onde pedir ajuda (padrão de servidor bom):
+• canal de dúvidas (manda print/log e contexto)
+• canal de projetos (feedback)
+• canal de recursos/trilhas (links organizados)
+
+Se você me disser sua dúvida (tipo “erro no Node”, “CSS”, “Discord.js”), eu te falo o melhor canal pra postar.`
+            ),
+
+            "/regras": () => (
+                `Regras rápidas (pra manter o servidor bom):
+• sem humilhar iniciantes
+• poste dúvida com contexto (o que tentou + erro + trecho)
+• sem spam
+• respeito sempre
+
+Quer um modelo pronto de como postar uma dúvida bem feita?`
+            ),
+
+            "/limpar": () => {
+                clearChatUI();
+                showToast("Chat limpo!");
+                return null;
+            },
+        };
+
+        function smartAnswer(qRaw) {
+            const q = normalize(qRaw);
+            const is = (re) => re.test(q);
+
+            if (q.startsWith("/")) {
+                const cmd = q.split(" ")[0];
+                if (COMMANDS[cmd]) return COMMANDS[cmd]();
+                return `Não conheço esse comando 😅\nDigite /help pra ver a lista.`;
+            }
+
+            if (is(/\b(oi|ola|olá|eae|opa)\b/)) return `Opa! Quer começar por onde? Digita /trilhas ou me fala seu objetivo (ex: “quero fazer bot”, “quero site”, “quero aprender python”).`;
+            if (is(/\b(gratuito|gratis|paga|custa|preco)\b/)) return `É 100% gratuito. A ideia é todo mundo evoluir junto: trilhas + projetos + ajuda no chat.`;
+            if (is(/\b(link|convite|discord|entrar|invite)\b/)) return `Tá aqui o convite: ${INVITE}\nSe quiser, digita /copy pra eu copiar pra você.`;
+            if (is(/\b(mentoria|review|ao vivo|call)\b/)) return COMMANDS["/mentoria"]();
+            if (is(/\b(evento|desafio|seman)\b/)) return COMMANDS["/eventos"]();
+            if (is(/\b(trilha|roadmap|come(ç|c)ar|iniciante|do zero)\b/)) return COMMANDS["/trilhas"]();
+            if (is(/\b(bot|discord\.js|discordjs)\b/)) return `Pra bot no Discord, o caminho mais rápido é:\n• JavaScript básico → Node.js → discord.js\nQuer que eu te passe uma sequência de estudo + 3 ideias de projeto?`;
+            if (is(/\b(api|backend|back-end|servidor|express|node)\b/)) return `Back-end na prática:\n• Node.js + Express → rotas → validação → banco de dados → deploy\nVocê tá travado em quê: rotas, DB, auth ou deploy?`;
+            if (is(/\b(css|html|front|layout)\b/)) return `Front-end:\n• HTML estrutura → CSS (flex/grid) → responsivo → JS pra interações\nQual sua maior dor: responsivo, alinhamento ou animações?`;
+            if (is(/\bpython\b/)) return `Python é ótimo pra começar.\nSugestão: lógica → funções → listas/dicts → automações → APIs.\nVocê quer automação ou web com Python?`;
+            if (is(/\b(obrigado|valeu|tmj)\b/)) return `Tamo junto! Se quiser acelerar, entra no Discord e manda teu objetivo (tipo “quero bot” ou “quero front”).`;
+
+            return `Entendi 👀\nMe fala seu objetivo em 1 frase (ex: “quero fazer um bot”, “quero arrumar meu CSS”, “quero aprender back-end”).\nOu digita /help pra ver comandos.`;
+        }
+
+        function openChat() {
+            chat.classList.add("open");
+            chatBtn.setAttribute("aria-expanded", "true");
+            chatOverlay.hidden = false;
+
+            requestAnimationFrame(() => chatOverlay.classList.add("on"));
+
+            notif.style.display = "none";
+            if (window.innerWidth < 620) setBodyLock(true);
+
+            setTimeout(() => chatInput.focus(), 120);
+        }
+
+        function closeChat() {
+            chat.classList.remove("open");
+            chat.classList.remove("min");
+            chatBtn.setAttribute("aria-expanded", "false");
+            chatOverlay.classList.remove("on");
+            setTimeout(() => {
+                if (!chat.classList.contains("open")) chatOverlay.hidden = true;
+            }, 180);
+
+            if (window.innerWidth < 620) setBodyLock(false);
+        }
+
+        function toggleMin() {
+            if (!chat.classList.contains("open")) return;
+            chat.classList.toggle("min");
+        }
+
+        function clearChatUI() {
+            chatBody.innerHTML = "";
+            addMsg(
+                `Opa! Eu te ajudo rapidinho.\nDigite /help ou manda algo tipo:\n• “quero fazer bot no Discord”\n• “sou iniciante, começo por onde?”\n• “quero aprender back-end”`,
+                "bot"
+            );
+            chatSugg.style.display = "";
+            persistChat();
+        }
+
+        function restoreChat() {
+            try {
+                const raw = localStorage.getItem(LS_KEY);
+                if (!raw) return false;
+                const items = JSON.parse(raw);
+                if (!Array.isArray(items) || !items.length) return false;
+
+                restoring = true;
+                chatBody.innerHTML = "";
+                for (const it of items) addMsg(it.text, it.who === "bot" ? "bot" : "me");
+                restoring = false;
+                return true;
+            } catch {
+                restoring = false;
+                return false;
+            }
+        }
+
+        function ask(q) {
+            addMsg(q, "me");
+            const t = addTyping();
+
+            const delay = 520 + Math.random() * 520;
+            setTimeout(async () => {
+                t.remove();
+                let a = smartAnswer(q);
+                if (typeof a?.then === "function") a = await a;
+                if (a) addMsg(a, "bot");
+                chatSugg.style.display = "none";
+            }, delay);
+        }
+
+        function sendMsg() {
+            const q = chatInput.value.trim();
+            if (!q) return;
+            chatInput.value = "";
+            chatSugg.style.display = "none";
+            ask(q);
+        }
+
+        chatBtn.addEventListener("click", () => {
+            if (chat.classList.contains("open")) closeChat();
+            else openChat();
+        });
+
+        chatOverlay.addEventListener("click", closeChat);
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeChat();
+        });
+
+        document.addEventListener("click", (e) => {
+            if (e.target.closest("#chatClose")) closeChat();
+            if (e.target.closest("#chatClear")) {
+                clearChatUI();
+                showToast("Chat limpo!");
+            }
+            if (e.target.closest("#chatMin")) toggleMin();
+        });
+
+        chatSugg.addEventListener("click", (e) => {
+            const btn = e.target.closest(".sugg");
+            if (!btn) return;
+            ask(btn.dataset.q);
+        });
+
+        chatSend.addEventListener("click", sendMsg);
+        chatInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") sendMsg();
+        });
+
+        if (!restoreChat()) clearChatUI();
+
+        const OPEN_HINT_KEY = "devshub_openhint";
+        if (!localStorage.getItem(OPEN_HINT_KEY)) {
+            setTimeout(() => {
+                if ((document.documentElement.scrollTop || 0) > 120) {
+                    notif.style.display = "";
+                    localStorage.setItem(OPEN_HINT_KEY, "1");
+                }
+            }, 2500);
+        }
+
+        (async function loadDiscordCounts() {
+            try {
+                const res = await fetch(`https://discord.com/api/v10/invites/${INVITE_CODE}?with_counts=true`, { cache: "no-store" });
+                if (!res.ok) return;
+                const data = await res.json();
+                const members = data?.approximate_member_count;
+                const online = data?.approximate_presence_count;
+
+                if (typeof members === "number") $("#statMembers").textContent = members.toLocaleString("pt-BR");
+                if (typeof online === "number") $("#statOnline").textContent = `${online.toLocaleString("pt-BR")} online`;
+            } catch { }
+        })();
+    </script>
+</body>
+
+</html>
